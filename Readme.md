@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг»
 
 * Студент: [Дмитрий Бороздин](https://up.htmlacademy.ru/javascript/23/user/1306767).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Клименко](https://htmlacademy.ru/profile/be_more_human).
 
 ---
 
