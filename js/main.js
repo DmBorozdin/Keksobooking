@@ -102,7 +102,7 @@ const shuffleArray = (array) => {
   return array;
 };
 
-const getNewRandomArray = (array) => shuffleArray(array).slice(0, getRandomPositiveInteger(1, array.length));
+const getNewRandomArray = (array) => shuffleArray(array.slice()).slice(0, getRandomPositiveInteger(1, array.length));
 
 const createAd = () => {
   const ad = {
