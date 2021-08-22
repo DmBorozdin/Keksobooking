@@ -20,7 +20,6 @@ const TYPE = [
   'flat',
   'house',
   'bungalow',
-  'hotel',
 ];
 const TIME = [
   '12:00',
