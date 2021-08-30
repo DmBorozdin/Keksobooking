@@ -1,11 +1,11 @@
-const getRandomPositiveInteger = function (lower, upper) {
+const getRandomPositiveInteger = (lower, upper) => {
   const min = Math.ceil(Math.min(Math.abs(lower), Math.abs(upper)));
   const max = Math.floor(Math.max(Math.abs(lower), Math.abs(upper)));
 
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-const getRandomPositiveFloat = function (lower, upper, digits = 1) {
+const getRandomPositiveFloat = (lower, upper, digits = 1) => {
   const min = Math.min(Math.abs(lower), Math.abs(upper));
   const max = Math.max(Math.abs(lower), Math.abs(upper));
 

@@ -78,7 +78,7 @@ const AD_CONST = {
   count: 10,
 };
 
-const createAd = () => {
+const createAdInfo = () => {
   const ad = {
     author: {
       avatar: getRandomArrayElement(AVATAR),
@@ -105,6 +105,6 @@ const createAd = () => {
   return ad;
 };
 
-const ads = new Array(AD_CONST.count).fill(null).map(() => createAd());
+const adsInfo = new Array(AD_CONST.count).fill(null).map(() => createAdInfo());
 
-export {ads};
+export {adsInfo};
