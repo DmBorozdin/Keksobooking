@@ -1,12 +1,11 @@
-import {adsInfo} from './data.js';
-
 const adTemplate = document.querySelector('#card').content.querySelector('.popup');
-const mapCanvas = document.querySelector('.map__canvas');
+
+const isEmptyString = (data) => data !== '';
 
 const createAd = (adInfo) => {
   const ad = adTemplate.cloneNode(true);
 
-  ad.querySelector('.popup__title').textContent = adInfo.offer.title;
+  isEmptyString(adInfo.offer.title) ? ad.querySelector('.popup__title').textContent = adInfo.offer.title : ad.querySelector('.popup__title').style.display = 'none';
   ad.querySelector('.popup__text--address').textContent = adInfo.offer.address;
   ad.querySelector('.popup__text--price').innerHTML = `${adInfo.offer.price} <span>₽/ночь</span>`;
   switch(adInfo.offer.type) {
@@ -45,10 +44,4 @@ const createAd = (adInfo) => {
   return ad;
 };
 
-const createAds = () => {
-  const adsFragment = document.createDocumentFragment();
-  adsFragment.appendChild(createAd(adsInfo[0]));
-  mapCanvas.appendChild(adsFragment);
-};
-
-export {createAds};
+export {createAd};
