@@ -1,13 +1,14 @@
 const adTemplate = document.querySelector('#card').content.querySelector('.popup');
 
-const isEmptyString = (data) => data !== '';
+const isEmptyString = (data) => data !== '' && data !== undefined;
+const isEmptyNumber = (data) => data !== 0 && data !== undefined;
 
 const createAd = (adInfo) => {
   const ad = adTemplate.cloneNode(true);
 
   isEmptyString(adInfo.offer.title) ? ad.querySelector('.popup__title').textContent = adInfo.offer.title : ad.querySelector('.popup__title').style.display = 'none';
-  ad.querySelector('.popup__text--address').textContent = adInfo.offer.address;
-  ad.querySelector('.popup__text--price').innerHTML = `${adInfo.offer.price} <span>₽/ночь</span>`;
+  isEmptyString(adInfo.offer.address) ? ad.querySelector('.popup__text--address').textContent = adInfo.offer.address : ad.querySelector('.popup__text--address').style.display = 'none';
+  isEmptyNumber(adInfo.offer.price) ? ad.querySelector('.popup__text--price').innerHTML = `${adInfo.offer.price} <span>₽/ночь</span>` : ad.querySelector('.popup__text--price').style.display = 'none';
   switch(adInfo.offer.type) {
     case 'palace':
       ad.querySelector('.popup__type').textContent = 'Дворец';
@@ -22,7 +23,15 @@ const createAd = (adInfo) => {
       ad.querySelector('.popup__type').textContent = 'Бунгало';
       break;
   }
-  ad.querySelector('.popup__text--capacity').textContent = `${adInfo.offer.rooms} комнаты для ${adInfo.offer.guests} гостей`;
+  let capacityText = '';
+  if (isEmptyNumber(adInfo.offer.rooms)) {
+    capacityText = `${adInfo.offer.rooms} комнаты`;
+  }
+  if (isEmptyNumber(adInfo.offer.guests)) {
+    capacityText += ` для ${adInfo.offer.guests} гостей`;
+  }
+  isEmptyString(capacityText) ? ad.querySelector('.popup__text--capacity').textContent = capacityText : ad.querySelector('.popup__text--capacity').style.display = 'none';
+  // ad.querySelector('.popup__text--capacity').textContent = `${adInfo.offer.rooms} комнаты для ${adInfo.offer.guests} гостей`;
   ad.querySelector('.popup__text--time').textContent = `Заезд после ${adInfo.offer.checkin}, выезд до ${adInfo.offer.checkout}`;
   for (let index = ad.querySelector('.popup__features').children.length - 1; index >= 0; index--) {
     const feature = ad.querySelector('.popup__features').children[index];
