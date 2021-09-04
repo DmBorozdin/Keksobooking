@@ -1,4 +1,2 @@
-import {createAds} from './ad.js';
+import './ad.js';
 import './form.js';
-
-createAds();
