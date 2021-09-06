@@ -8,6 +8,8 @@ const priceInput = form.querySelector('#price');
 const timein = form.querySelector('#timein');
 const timeout = form.querySelector('#timeout');
 const address = form.querySelector('#address');
+const roomNumber = form.querySelector('#room_number');
+const capacity = form.querySelector('#capacity').querySelectorAll('option');
 const mapFilters = document.querySelector('.map__filters');
 const filters = mapFilters.children;
 
@@ -141,6 +143,16 @@ type.addEventListener('change', () => {
       priceInput.min = FORM_CONST.minPrice.palace;
       break;
   }
+});
+
+roomNumber.addEventListener ('change', () => {
+  console.log(roomNumber.options[roomNumber.selectedIndex].value);
+  for (let index = capacity.length - 1; index >= 0; index--) {
+    if (capacity[index].value > roomNumber.options[roomNumber.selectedIndex].value) {
+      capacity[index].remove();
+    }
+  }
+  console.log(form.querySelector('#capacity').options);
 });
 
 timein.addEventListener('change', () => {
