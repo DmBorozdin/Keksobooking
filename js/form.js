@@ -9,7 +9,8 @@ const timein = form.querySelector('#timein');
 const timeout = form.querySelector('#timeout');
 const address = form.querySelector('#address');
 const roomNumber = form.querySelector('#room_number');
-const capacity = form.querySelector('#capacity').querySelectorAll('option');
+const capacity = form.querySelector('#capacity');
+const capacityList = capacity.querySelectorAll('option');
 const mapFilters = document.querySelector('.map__filters');
 const filters = mapFilters.children;
 
@@ -37,6 +38,10 @@ const FORM_CONST = {
     width: 40,
     height: 40,
   },
+  capacity: {
+    roomNumber100: '0',
+  },
+  roomNumberMax: '100',
 };
 
 form.classList.add('ad-form--disabled');
@@ -145,14 +150,23 @@ type.addEventListener('change', () => {
   }
 });
 
-roomNumber.addEventListener ('change', () => {
-  console.log(roomNumber.options[roomNumber.selectedIndex].value);
-  for (let index = capacity.length - 1; index >= 0; index--) {
-    if (capacity[index].value > roomNumber.options[roomNumber.selectedIndex].value) {
-      capacity[index].remove();
+const getFilteredCapacity = () => {
+  capacity.options.length = 0;
+  for (let index = 0; index < capacityList.length; index++) {
+    if ((capacityList[index].value <= roomNumber.options[roomNumber.selectedIndex].value && capacityList[index].value !== FORM_CONST.capacity.roomNumber100) &&
+      roomNumber.options[roomNumber.selectedIndex].value !== FORM_CONST.roomNumberMax ||
+      roomNumber.options[roomNumber.selectedIndex].value === FORM_CONST.roomNumberMax && capacityList[index].value === FORM_CONST.capacity.roomNumber100) {
+      capacity[capacity.length] = new Option(capacityList[index].textContent,capacityList[index].value);
     }
   }
-  console.log(form.querySelector('#capacity').options);
+};
+
+window.addEventListener('load', () => {
+  getFilteredCapacity();
+});
+
+roomNumber.addEventListener ('change', () => {
+  getFilteredCapacity();
 });
 
 timein.addEventListener('change', () => {
