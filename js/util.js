@@ -1,28 +1,38 @@
-const getRandomPositiveInteger = (lower, upper) => {
-  const min = Math.ceil(Math.min(Math.abs(lower), Math.abs(upper)));
-  const max = Math.floor(Math.max(Math.abs(lower), Math.abs(upper)));
+const errorTemplate = document.querySelector('#error').content.querySelector('.error');
+const ERROR_SHOW_TIME = 3000;
 
-  return Math.floor(Math.random() * (max - min + 1) + min);
+const showErrorMessage = (message) => {
+  const errorMessage = errorTemplate.cloneNode(true);
+
+  errorMessage.querySelector('.error__message').textContent = message;
+
+  document.body.appendChild(errorMessage);
 };
 
-const getRandomPositiveFloat = (lower, upper, digits = 1) => {
-  const min = Math.min(Math.abs(lower), Math.abs(upper));
-  const max = Math.max(Math.abs(lower), Math.abs(upper));
+const showErrorDownload = (message) => {
+  const errorContainer = document.createElement('div');
+  const errorContainerMessage = document.createElement('p');
+  errorContainer.style.zIndex = 1100;
+  errorContainer.style.position = 'absolute';
+  errorContainer.style.left = 0;
+  errorContainer.style.top = 0;
+  errorContainer.style.width = '100%';
+  errorContainer.style.height  = '100%';
+  errorContainer.style.display = 'flex';
+  errorContainer.style.alignItems = 'center';
+  errorContainer.style.justifyContent = 'center';
+  errorContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
 
-  return +(Math.random() * (max - min) + min).toFixed(digits);
+  errorContainerMessage.textContent = message;
+  errorContainerMessage.style.color = '#fff';
+  errorContainerMessage.style.fontSize = '30px';
+
+  errorContainer.appendChild(errorContainerMessage);
+  document.querySelector('.map').appendChild(errorContainer);
+
+  setTimeout(() => {
+    errorContainer.remove();
+  }, ERROR_SHOW_TIME);
 };
 
-const getRandomArrayElement = (array) => array[getRandomPositiveInteger(0, array.length - 1)];
-
-const shuffleArray = (array) => {
-  for (let index = array.length - 1; index > 0; index--) {
-    const RANDOM_INDEX = Math.floor(Math.random() * (index + 1));
-    [array[index], array[RANDOM_INDEX]] = [array[RANDOM_INDEX], array[index]];
-  }
-
-  return array;
-};
-
-const getNewRandomArray = (array) => shuffleArray(array.slice()).slice(0, getRandomPositiveInteger(1, array.length));
-
-export {getRandomPositiveInteger, getRandomPositiveFloat, getRandomArrayElement, getNewRandomArray};
+export {showErrorMessage, showErrorDownload};
