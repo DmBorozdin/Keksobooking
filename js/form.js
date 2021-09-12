@@ -1,3 +1,5 @@
+import { isEscEvent, removeSuccessMessage } from './util.js';
+
 const form = document.querySelector('.ad-form');
 const fieldsets = form.querySelectorAll('fieldset');
 const type = form.querySelector('#type');
@@ -15,6 +17,37 @@ const FORM_CONST = {
   },
   roomNumberMax: '100',
 };
+
+const closeSuccessMessage = (EscKeydown) => {
+  removeSuccessMessage();
+  document.removeEventListener('keydown', EscKeydown);
+};
+
+const onEscKeydown = (evt) => {
+  if (isEscEvent(evt)) {
+    evt.preventDefault();
+    closeSuccessMessage(onEscKeydown);
+  }
+};
+
+const setUserFormSubmit = (onSuccess) => {
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    const formData = new FormData(evt.target);
+
+    fetch('https://22.javascript.pages.academy/keksobooking',
+      {
+        method: 'POST',
+        body: formData,
+      },
+    )
+      .then(() => onSuccess())
+      .then(() => document.addEventListener('click', console.log('Сделан клик')))
+      .catch((err) => {console.log(err);});
+    document.addEventListener('keydown', onEscKeydown);
+  });
+};
+
 
 form.classList.add('ad-form--disabled');
 for(const fieldset of fieldsets) {
@@ -70,3 +103,5 @@ timein.addEventListener('change', () => {
 timeout.addEventListener('change', () => {
   timein.selectedIndex = timeout.selectedIndex;
 });
+
+export {setUserFormSubmit};
