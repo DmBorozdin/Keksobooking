@@ -12,15 +12,32 @@ const capacity = form.querySelector('#capacity');
 const capacityList = capacity.querySelectorAll('option');
 
 const FORM_CONST = {
+  minPrice: {
+    bungalow: 0,
+    flat: 1000,
+    house: 5000,
+    palace: 10000,
+  },
   capacity: {
     roomNumber100: '0',
   },
   roomNumberMax: '100',
 };
 
-const closeSuccessMessage = (EscKeydown) => {
+const getFilteredCapacity = () => {
+  capacity.options.length = 0;
+  for (let index = 0; index < capacityList.length; index++) {
+    if ((capacityList[index].value <= roomNumber.options[roomNumber.selectedIndex].value && capacityList[index].value !== FORM_CONST.capacity.roomNumber100) &&
+      roomNumber.options[roomNumber.selectedIndex].value !== FORM_CONST.roomNumberMax ||
+      roomNumber.options[roomNumber.selectedIndex].value === FORM_CONST.roomNumberMax && capacityList[index].value === FORM_CONST.capacity.roomNumber100) {
+      capacity[capacity.length] = new Option(capacityList[index].textContent,capacityList[index].value);
+    }
+  }
+};
+
+const closeSuccessMessage = (escKeydown) => {
   removeSuccessMessage();
-  document.removeEventListener('keydown', EscKeydown);
+  document.removeEventListener('keydown', escKeydown);
 };
 
 const onEscKeydown = (evt) => {
@@ -30,7 +47,15 @@ const onEscKeydown = (evt) => {
   }
 };
 
-const setUserFormSubmit = (onSuccess) => {
+const resetForm = (resetMainPinMarker) => {
+  form.reset();
+  priceInput.placeholder = FORM_CONST.minPrice.flat;
+  priceInput.min = FORM_CONST.minPrice.flat;
+  getFilteredCapacity();
+  resetMainPinMarker();
+};
+
+const setUserFormSubmit = (onSuccess, resetMainPinMarker) => {
   form.addEventListener('submit', (evt) => {
     evt.preventDefault();
     const formData = new FormData(evt.target);
@@ -42,9 +67,12 @@ const setUserFormSubmit = (onSuccess) => {
       },
     )
       .then(() => onSuccess())
-      .then(() => document.addEventListener('click', console.log('Сделан клик')))
+      .then(() => {
+        document.addEventListener('keydown', onEscKeydown);
+        document.querySelector('.success').addEventListener('click', closeSuccessMessage);
+        resetForm(resetMainPinMarker);
+      })
       .catch((err) => {console.log(err);});
-    document.addEventListener('keydown', onEscKeydown);
   });
 };
 
@@ -76,17 +104,6 @@ type.addEventListener('change', () => {
       break;
   }
 });
-
-const getFilteredCapacity = () => {
-  capacity.options.length = 0;
-  for (let index = 0; index < capacityList.length; index++) {
-    if ((capacityList[index].value <= roomNumber.options[roomNumber.selectedIndex].value && capacityList[index].value !== FORM_CONST.capacity.roomNumber100) &&
-      roomNumber.options[roomNumber.selectedIndex].value !== FORM_CONST.roomNumberMax ||
-      roomNumber.options[roomNumber.selectedIndex].value === FORM_CONST.roomNumberMax && capacityList[index].value === FORM_CONST.capacity.roomNumber100) {
-      capacity[capacity.length] = new Option(capacityList[index].textContent,capacityList[index].value);
-    }
-  }
-};
 
 window.addEventListener('load', () => {
   getFilteredCapacity();

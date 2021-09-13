@@ -5,12 +5,6 @@ const mapFilters = document.querySelector('.map__filters');
 const filters = mapFilters.children;
 
 const MAP_CONST = {
-  minPrice: {
-    bungalow: 0,
-    flat: 1000,
-    house: 5000,
-    palace: 10000,
-  },
   mapView: {
     lat: 35.67,
     lng: 139.785,
@@ -30,7 +24,9 @@ const MAP_CONST = {
   },
 };
 
-address.value = `${MAP_CONST.mainPinMarker.lat.toFixed(5)}, ${MAP_CONST.mainPinMarker.lng.toFixed(5)}`;
+const setAddressField = () => {
+  address.value = `${MAP_CONST.mainPinMarker.lat.toFixed(5)}, ${MAP_CONST.mainPinMarker.lng.toFixed(5)}`;
+};
 
 mapFilters.classList.add('map__filters--disabled');
 for(const filter of filters) {
@@ -47,6 +43,7 @@ const map = L.map('map-canvas')
     for(const filter of filters) {
       filter.disabled = false;
     }
+    setAddressField();
   })
   .setView({
     lat: MAP_CONST.mapView.lat,
@@ -83,6 +80,11 @@ mainPinMarker.on('moveend', (evt) =>{
   address.value = `${evt.target.getLatLng().lat.toFixed(5)}, ${evt.target.getLatLng().lng.toFixed(5)}`;
 });
 
+const resetMainPinMarker = () => {
+  mainPinMarker.setLatLng([MAP_CONST.mainPinMarker.lat, MAP_CONST.mainPinMarker.lng]);
+  setAddressField();
+};
+
 const createMarkers = (adsInfo, createAd) => {
   adsInfo.forEach((adInfo) => {
     const pinIcon = L.icon({
@@ -112,4 +114,4 @@ const createMarkers = (adsInfo, createAd) => {
   });
 };
 
-export {createMarkers};
+export {createMarkers, resetMainPinMarker};
