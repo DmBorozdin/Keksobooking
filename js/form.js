@@ -1,4 +1,5 @@
-import { isEscEvent, removeSuccessMessage } from './util.js';
+import { isEscEvent } from './util.js';
+import { sendData } from './api.js';
 
 const form = document.querySelector('.ad-form');
 const fieldsets = form.querySelectorAll('fieldset');
@@ -10,6 +11,9 @@ const address = form.querySelector('#address');
 const roomNumber = form.querySelector('#room_number');
 const capacity = form.querySelector('#capacity');
 const capacityList = capacity.querySelectorAll('option');
+// const errorTemplate = document.querySelector('#error').content.querySelector('.error');
+const successTemplate = document.querySelector('#success').content.querySelector('.success');
+const main = document.querySelector('main');
 
 const FORM_CONST = {
   minPrice: {
@@ -35,16 +39,20 @@ const getFilteredCapacity = () => {
   }
 };
 
-const closeSuccessMessage = (escKeydown) => {
-  removeSuccessMessage();
-  document.removeEventListener('keydown', escKeydown);
-};
+// const showErrorMessage = () => main.appendChild(errorTemplate.cloneNode(true));
+
+// const removeSuccessMessage = () => main.querySelector('.success').remove();
 
 const onEscKeydown = (evt) => {
   if (isEscEvent(evt)) {
     evt.preventDefault();
-    closeSuccessMessage(onEscKeydown);
+    closeSuccessMessage();
   }
+};
+
+const closeSuccessMessage = () => {
+  main.querySelector('.success').remove();
+  document.removeEventListener('keydown', onEscKeydown);
 };
 
 const resetForm = (resetMainPinMarker) => {
@@ -55,27 +63,24 @@ const resetForm = (resetMainPinMarker) => {
   resetMainPinMarker();
 };
 
-const setUserFormSubmit = (onSuccess, resetMainPinMarker) => {
-  form.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-    const formData = new FormData(evt.target);
-
-    fetch('https://22.javascript.pages.academy/keksobooking',
-      {
-        method: 'POST',
-        body: formData,
-      },
-    )
-      .then(() => onSuccess())
-      .then(() => {
-        document.addEventListener('keydown', onEscKeydown);
-        document.querySelector('.success').addEventListener('click', closeSuccessMessage);
-        resetForm(resetMainPinMarker);
-      })
-      .catch((err) => {console.log(err);});
-  });
+const showSuccessMessage = (resetMainPinMarker) => {
+  main.appendChild(successTemplate.cloneNode(true));
+  document.addEventListener('keydown', onEscKeydown);
+  document.querySelector('.success').addEventListener('click', closeSuccessMessage);
+  resetForm(resetMainPinMarker);
 };
 
+const setUserFormSubmit = (resetMainPinMarker) => {
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    sendData(
+      () => showSuccessMessage(resetMainPinMarker),
+      () => console.log('Ошибка'),
+      new FormData(evt.target),
+    );
+  });
+};
 
 form.classList.add('ad-form--disabled');
 for(const fieldset of fieldsets) {

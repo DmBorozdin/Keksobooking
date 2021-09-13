@@ -22,4 +22,28 @@ const getData = (onSuccess) => {
     });
 };
 
-export {getData};
+const sendData = (onSuccess, onFail, body) => {
+  fetch('https://22.javascript.pages.academy/keksobooking1',
+    {
+      method: 'POST',
+      body,
+    },
+  )
+    .then((response) => {
+      if (response.ok) {
+        onSuccess();
+      } else {
+        onFail();
+      }
+    })
+    // .then(() => {
+    //   document.addEventListener('keydown', onEscKeydown);
+    //   document.querySelector('.success').addEventListener('click', closeSuccessMessage);
+    //   resetForm(resetMainPinMarker);
+    // })
+    .catch(() => {
+      onFail();
+    });
+};
+
+export {getData, sendData};

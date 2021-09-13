@@ -1,13 +1,4 @@
-const errorTemplate = document.querySelector('#error').content.querySelector('.error');
-const successTemplate = document.querySelector('#success').content.querySelector('.success');
-const main = document.querySelector('main');
 const ERROR_SHOW_TIME = 3000;
-
-const showErrorMessage = () => main.appendChild(errorTemplate.cloneNode(true));
-
-const showSuccessMessage = () => main.appendChild(successTemplate.cloneNode(true));
-
-const removeSuccessMessage = () => main.querySelector('.success').remove();
 
 const showErrorDownload = (message) => {
   const errorContainer = document.createElement('div');
@@ -37,4 +28,4 @@ const showErrorDownload = (message) => {
 
 const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
-export {showErrorMessage, showErrorDownload, showSuccessMessage, removeSuccessMessage, isEscEvent};
+export { showErrorDownload, isEscEvent};
