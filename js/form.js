@@ -10,6 +10,7 @@ const timeout = form.querySelector('#timeout');
 const address = form.querySelector('#address');
 const roomNumber = form.querySelector('#room_number');
 const capacity = form.querySelector('#capacity');
+const reset = form.querySelector('.ad-form__reset');
 const capacityList = capacity.querySelectorAll('option');
 const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
@@ -94,6 +95,13 @@ const setUserFormSubmit = (resetMainPinMarker) => {
   });
 };
 
+const resetUserForm = (resetMainPinMarker) => {
+  reset.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    resetForm(resetMainPinMarker);
+  });
+};
+
 form.classList.add('ad-form--disabled');
 for(const fieldset of fieldsets) {
   fieldset.disabled = true;
@@ -122,20 +130,12 @@ type.addEventListener('change', () => {
   }
 });
 
-window.addEventListener('load', () => {
-  getFilteredCapacity();
-});
+window.addEventListener('load', () => getFilteredCapacity());
 
-roomNumber.addEventListener ('change', () => {
-  getFilteredCapacity();
-});
+roomNumber.addEventListener ('change', () => getFilteredCapacity());
 
-timein.addEventListener('change', () => {
-  timeout.selectedIndex = timein.selectedIndex;
-});
+timein.addEventListener('change', () => timeout.selectedIndex = timein.selectedIndex);
 
-timeout.addEventListener('change', () => {
-  timein.selectedIndex = timeout.selectedIndex;
-});
+timeout.addEventListener('change', () => timein.selectedIndex = timeout.selectedIndex);
 
-export {setUserFormSubmit};
+export {setUserFormSubmit, resetUserForm};

@@ -1,5 +1,5 @@
 import {createAd} from './ad.js';
-import {setUserFormSubmit} from './form.js';
+import {setUserFormSubmit, resetUserForm} from './form.js';
 import {createMarkers, resetMainPinMarker} from './map.js';
 import {getData} from './api.js';
 
@@ -8,3 +8,4 @@ getData((ads) => {
 });
 
 setUserFormSubmit(resetMainPinMarker);
+resetUserForm(resetMainPinMarker);
