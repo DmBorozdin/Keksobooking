@@ -40,26 +40,27 @@ const getFilteredCapacity = () => {
   }
 };
 
+let closeSuccessMessage = null;
+let closeErrorMessage = null;
+
 const onEscKeydown = (evt) => {
   if (isEscEvent(evt)) {
     evt.preventDefault();
     if (document.querySelector('.success')) {
-      // eslint-disable-next-line no-use-before-define
       closeSuccessMessage();
     }
     if (document.querySelector('.error')) {
-      // eslint-disable-next-line no-use-before-define
       closeErrorMessage();
     }
   }
 };
 
-const closeSuccessMessage = () => {
+closeSuccessMessage = () => {
   main.querySelector('.success').remove();
   document.removeEventListener('keydown', onEscKeydown);
 };
 
-const closeErrorMessage = () => {
+closeErrorMessage = () => {
   main.querySelector('.error').remove();
   document.removeEventListener('keydown', onEscKeydown);
 };
