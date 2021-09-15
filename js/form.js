@@ -11,7 +11,7 @@ const address = form.querySelector('#address');
 const roomNumber = form.querySelector('#room_number');
 const capacity = form.querySelector('#capacity');
 const capacityList = capacity.querySelectorAll('option');
-// const errorTemplate = document.querySelector('#error').content.querySelector('.error');
+const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
 const main = document.querySelector('main');
 
@@ -39,19 +39,25 @@ const getFilteredCapacity = () => {
   }
 };
 
-// const showErrorMessage = () => main.appendChild(errorTemplate.cloneNode(true));
-
-// const removeSuccessMessage = () => main.querySelector('.success').remove();
-
 const onEscKeydown = (evt) => {
   if (isEscEvent(evt)) {
     evt.preventDefault();
-    closeSuccessMessage();
+    if (document.querySelector('.success')) {
+      closeSuccessMessage();
+    }
+    if (document.querySelector('.error')) {
+      closeErrorMessage();
+    }
   }
 };
 
 const closeSuccessMessage = () => {
   main.querySelector('.success').remove();
+  document.removeEventListener('keydown', onEscKeydown);
+};
+
+const closeErrorMessage = () => {
+  main.querySelector('.error').remove();
   document.removeEventListener('keydown', onEscKeydown);
 };
 
@@ -70,13 +76,19 @@ const showSuccessMessage = (resetMainPinMarker) => {
   resetForm(resetMainPinMarker);
 };
 
+const showErrorMessage = () => {
+  main.appendChild(errorTemplate.cloneNode(true));
+  document.addEventListener('keydown', onEscKeydown);
+  document.querySelector('.error').addEventListener('click', closeErrorMessage);
+};
+
 const setUserFormSubmit = (resetMainPinMarker) => {
   form.addEventListener('submit', (evt) => {
     evt.preventDefault();
 
     sendData(
       () => showSuccessMessage(resetMainPinMarker),
-      () => console.log('Ошибка'),
+      () => showErrorMessage(),
       new FormData(evt.target),
     );
   });

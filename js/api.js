@@ -23,7 +23,7 @@ const getData = (onSuccess) => {
 };
 
 const sendData = (onSuccess, onFail, body) => {
-  fetch('https://22.javascript.pages.academy/keksobooking1',
+  fetch('https://22.javascript.pages.academy/keksobooking',
     {
       method: 'POST',
       body,
@@ -36,11 +36,6 @@ const sendData = (onSuccess, onFail, body) => {
         onFail();
       }
     })
-    // .then(() => {
-    //   document.addEventListener('keydown', onEscKeydown);
-    //   document.querySelector('.success').addEventListener('click', closeSuccessMessage);
-    //   resetForm(resetMainPinMarker);
-    // })
     .catch(() => {
       onFail();
     });
