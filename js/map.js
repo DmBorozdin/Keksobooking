@@ -87,8 +87,6 @@ const resetMainPinMarker = () => {
   setAddressField();
 };
 
-let rankSetting = 0;
-
 const getAdRank = (ad) => {
   let rank = 0;
   if (ad.offer.type === housingType.options[housingType.selectedIndex].value) {
@@ -138,9 +136,33 @@ const createMarkers = (adsInfo, createAd) => {
     });
 };
 
-const setHousingType = (cb) => {
-  housingType.addEventListener('change', () => housingType.selectedIndex !==0 ? rankSetting++ : rankSetting--);
-  cb();
+const filtersRank = {
+  type: 0,
+  price: 0,
+  rooms: 0,
+  guests: 0,
+  wifi: 0,
+  dishwasher: 0,
+  parking: 0,
+  washer: 0,
+  elevator: 0,
+  conditioner: 0,
 };
 
-export {createMarkers, resetMainPinMarker,setHousingType};
+let sumFiltersRank = 0;
+
+const getSumFiltersRank = () => {
+  sumFiltersRank = Object.values(filtersRank).reduce((accumulator, filterRank) => accumulator + filterRank, 0);
+};
+
+const setHousingType = (cb) => {
+  housingType.addEventListener('change', () => {
+    filtersRank.type = housingType.selectedIndex !== 0 ? 1 : 0;
+    getSumFiltersRank();
+    console.log(filtersRank.type);
+    console.log(sumFiltersRank);
+    cb();
+  });
+};
+
+export {createMarkers, resetMainPinMarker, setHousingType};
