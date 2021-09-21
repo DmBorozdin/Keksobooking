@@ -1,5 +1,5 @@
-import {adsInfo} from './data.js';
-import {createAd} from './ad.js';
+import { isEscEvent } from './util.js';
+import { sendData } from './api.js';
 
 const form = document.querySelector('.ad-form');
 const fieldsets = form.querySelectorAll('fieldset');
@@ -10,9 +10,11 @@ const timeout = form.querySelector('#timeout');
 const address = form.querySelector('#address');
 const roomNumber = form.querySelector('#room_number');
 const capacity = form.querySelector('#capacity');
+const reset = form.querySelector('.ad-form__reset');
 const capacityList = capacity.querySelectorAll('option');
-const mapFilters = document.querySelector('.map__filters');
-const filters = mapFilters.children;
+const errorTemplate = document.querySelector('#error').content.querySelector('.error');
+const successTemplate = document.querySelector('#success').content.querySelector('.success');
+const main = document.querySelector('main');
 
 const FORM_CONST = {
   minPrice: {
@@ -21,113 +23,94 @@ const FORM_CONST = {
     house: 5000,
     palace: 10000,
   },
-  mapView: {
-    lat: 35.67,
-    lng: 139.785,
-    zoom: 12,
-  },
-  mainPinMarker: {
-    lat: 35.6634,
-    lng: 139.77321,
-  },
-  mainPinIcon: {
-    width: 52,
-    height: 52,
-  },
-  pinIcon: {
-    width: 40,
-    height: 40,
-  },
   capacity: {
     roomNumber100: '0',
   },
   roomNumberMax: '100',
 };
 
+const getFilteredCapacity = () => {
+  capacity.options.length = 0;
+  for (let index = 0; index < capacityList.length; index++) {
+    if ((capacityList[index].value <= roomNumber.options[roomNumber.selectedIndex].value && capacityList[index].value !== FORM_CONST.capacity.roomNumber100) &&
+      roomNumber.options[roomNumber.selectedIndex].value !== FORM_CONST.roomNumberMax ||
+      roomNumber.options[roomNumber.selectedIndex].value === FORM_CONST.roomNumberMax && capacityList[index].value === FORM_CONST.capacity.roomNumber100) {
+      capacity[capacity.length] = new Option(capacityList[index].textContent,capacityList[index].value);
+    }
+  }
+};
+
+let closeSuccessMessage = null;
+let closeErrorMessage = null;
+
+const onEscKeydown = (evt) => {
+  if (isEscEvent(evt)) {
+    evt.preventDefault();
+    if (document.querySelector('.success')) {
+      closeSuccessMessage();
+    }
+    if (document.querySelector('.error')) {
+      closeErrorMessage();
+    }
+  }
+};
+
+closeSuccessMessage = () => {
+  main.querySelector('.success').remove();
+  document.removeEventListener('keydown', onEscKeydown);
+};
+
+closeErrorMessage = () => {
+  main.querySelector('.error').remove();
+  document.removeEventListener('keydown', onEscKeydown);
+};
+
+const resetForm = (resetMainPinMarker) => {
+  form.reset();
+  priceInput.placeholder = FORM_CONST.minPrice.flat;
+  priceInput.min = FORM_CONST.minPrice.flat;
+  getFilteredCapacity();
+  resetMainPinMarker();
+};
+
+const showSuccessMessage = (resetMainPinMarker) => {
+  main.appendChild(successTemplate.cloneNode(true));
+  document.addEventListener('keydown', onEscKeydown);
+  document.querySelector('.success').addEventListener('click', closeSuccessMessage);
+  resetForm(resetMainPinMarker);
+};
+
+const showErrorMessage = () => {
+  main.appendChild(errorTemplate.cloneNode(true));
+  document.addEventListener('keydown', onEscKeydown);
+  document.querySelector('.error').addEventListener('click', closeErrorMessage);
+};
+
+const setUserFormSubmit = (resetMainPinMarker) => {
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    sendData(
+      () => showSuccessMessage(resetMainPinMarker),
+      () => showErrorMessage(),
+      new FormData(evt.target),
+    );
+  });
+};
+
+const resetUserForm = (resetMainPinMarker) => {
+  reset.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    resetForm(resetMainPinMarker);
+  });
+};
+
 form.classList.add('ad-form--disabled');
 for(const fieldset of fieldsets) {
   fieldset.disabled = true;
 }
-mapFilters.classList.add('map__filters--disabled');
-for(const filter of filters) {
-  filter.disabled = true;
-}
 
-address.value = `${FORM_CONST.mainPinMarker.lat.toFixed(5)}, ${FORM_CONST.mainPinMarker.lng.toFixed(5)}`;
 address.readOnly = true;
-
-const map = L.map('map-canvas')
-  .on('load', () => {
-    form.classList.remove('ad-form--disabled');
-    for(const fieldset of fieldsets) {
-      fieldset.disabled = false;
-    }
-    mapFilters.classList.remove('map__filters--disabled');
-    for(const filter of filters) {
-      filter.disabled = false;
-    }
-  })
-  .setView({
-    lat: FORM_CONST.mapView.lat,
-    lng: FORM_CONST.mapView.lng,
-  }, FORM_CONST.mapView.zoom);
-
-L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  },
-).addTo(map);
-
-const mainPinIcon = L.icon({
-  iconUrl: './img/main-pin.svg',
-  iconSize: [FORM_CONST.mainPinIcon.width, FORM_CONST.mainPinIcon.height],
-  iconAnchor: [FORM_CONST.mainPinIcon.width/2, FORM_CONST.mainPinIcon.height],
-});
-
-const mainPinMarker = L.marker(
-  {
-    lat: FORM_CONST.mainPinMarker.lat,
-    lng: FORM_CONST.mainPinMarker.lng,
-  },
-  {
-    draggable: true,
-    icon: mainPinIcon,
-  },
-);
-
-mainPinMarker.addTo(map);
-
-mainPinMarker.on('moveend', (evt) =>{
-  address.value = `${evt.target.getLatLng().lat.toFixed(5)}, ${evt.target.getLatLng().lng.toFixed(5)}`;
-});
-
-adsInfo.forEach((adInfo) => {
-  const pinIcon = L.icon({
-    iconUrl: './img/pin.svg',
-    iconSize: [FORM_CONST.pinIcon.width, FORM_CONST.pinIcon.height],
-    iconAnchor: [FORM_CONST.pinIcon.width/2, FORM_CONST.pinIcon.height],
-  });
-
-  const marker = L.marker(
-    {
-      lat: adInfo.location.lat,
-      lng: adInfo.location.lng,
-    },
-    {
-      icon: pinIcon,
-    },
-  );
-
-  marker
-    .addTo(map)
-    .bindPopup(
-      createAd(adInfo),
-      {
-        keepInView: true,
-      },
-    );
-});
 
 type.addEventListener('change', () => {
   switch(type.options[type.selectedIndex].value) {
@@ -150,29 +133,12 @@ type.addEventListener('change', () => {
   }
 });
 
-const getFilteredCapacity = () => {
-  capacity.options.length = 0;
-  for (let index = 0; index < capacityList.length; index++) {
-    if ((capacityList[index].value <= roomNumber.options[roomNumber.selectedIndex].value && capacityList[index].value !== FORM_CONST.capacity.roomNumber100) &&
-      roomNumber.options[roomNumber.selectedIndex].value !== FORM_CONST.roomNumberMax ||
-      roomNumber.options[roomNumber.selectedIndex].value === FORM_CONST.roomNumberMax && capacityList[index].value === FORM_CONST.capacity.roomNumber100) {
-      capacity[capacity.length] = new Option(capacityList[index].textContent,capacityList[index].value);
-    }
-  }
-};
+window.addEventListener('load', () => getFilteredCapacity());
 
-window.addEventListener('load', () => {
-  getFilteredCapacity();
-});
+roomNumber.addEventListener ('change', () => getFilteredCapacity());
 
-roomNumber.addEventListener ('change', () => {
-  getFilteredCapacity();
-});
+timein.addEventListener('change', () => timeout.selectedIndex = timein.selectedIndex);
 
-timein.addEventListener('change', () => {
-  timeout.selectedIndex = timein.selectedIndex;
-});
+timeout.addEventListener('change', () => timein.selectedIndex = timeout.selectedIndex);
 
-timeout.addEventListener('change', () => {
-  timein.selectedIndex = timeout.selectedIndex;
-});
+export {setUserFormSubmit, resetUserForm};
