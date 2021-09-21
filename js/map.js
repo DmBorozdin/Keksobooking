@@ -3,6 +3,7 @@ const fieldsets = form.querySelectorAll('fieldset');
 const address = form.querySelector('#address');
 const mapFilters = document.querySelector('.map__filters');
 const filters = mapFilters.children;
+const housingType = mapFilters.querySelector('#housing-type');
 
 const MAP_CONST = {
   mapView: {
@@ -22,6 +23,7 @@ const MAP_CONST = {
     width: 40,
     height: 40,
   },
+  adsCount: 10,
 };
 
 const setAddressField = () => {
@@ -85,33 +87,60 @@ const resetMainPinMarker = () => {
   setAddressField();
 };
 
-const createMarkers = (adsInfo, createAd) => {
-  adsInfo.forEach((adInfo) => {
-    const pinIcon = L.icon({
-      iconUrl: './img/pin.svg',
-      iconSize: [MAP_CONST.pinIcon.width, MAP_CONST.pinIcon.height],
-      iconAnchor: [MAP_CONST.pinIcon.width/2, MAP_CONST.pinIcon.height],
-    });
+let rankSetting = 0;
 
-    const marker = L.marker(
-      {
-        lat: adInfo.location.lat,
-        lng: adInfo.location.lng,
-      },
-      {
-        icon: pinIcon,
-      },
-    );
+const getAdRank = (ad) => {
+  let rank = 0;
+  if (ad.offer.type === housingType.options[housingType.selectedIndex].value) {
+    rank ++;
+  }
 
-    marker
-      .addTo(map)
-      .bindPopup(
-        createAd(adInfo),
-        {
-          keepInView: true,
-        },
-      );
-  });
+  return rank;
 };
 
-export {createMarkers, resetMainPinMarker};
+const compareAds = (AdA, AdB) => {
+  const rankA = getAdRank(AdA);
+  const rankB = getAdRank(AdB);
+
+  return rankB - rankA;
+};
+
+const createMarkers = (adsInfo, createAd) => {
+  adsInfo
+    .slice()
+    .sort(compareAds)
+    .slice(0, MAP_CONST.adsCount)
+    .forEach((adInfo) => {
+      const pinIcon = L.icon({
+        iconUrl: './img/pin.svg',
+        iconSize: [MAP_CONST.pinIcon.width, MAP_CONST.pinIcon.height],
+        iconAnchor: [MAP_CONST.pinIcon.width/2, MAP_CONST.pinIcon.height],
+      });
+
+      const marker = L.marker(
+        {
+          lat: adInfo.location.lat,
+          lng: adInfo.location.lng,
+        },
+        {
+          icon: pinIcon,
+        },
+      );
+
+      marker
+        .addTo(map)
+        .bindPopup(
+          createAd(adInfo),
+          {
+            keepInView: true,
+          },
+        );
+    });
+};
+
+const setHousingType = (cb) => {
+  housingType.addEventListener('change', () => housingType.selectedIndex !==0 ? rankSetting++ : rankSetting--);
+  cb();
+};
+
+export {createMarkers, resetMainPinMarker,setHousingType};
