@@ -26,6 +26,9 @@ const MAP_CONST = {
   adsCount: 10,
 };
 
+const adsLayer = L.layerGroup([]);
+let sumFiltersRank = 0;
+
 const setAddressField = () => {
   address.value = `${MAP_CONST.mainPinMarker.lat.toFixed(5)}, ${MAP_CONST.mainPinMarker.lng.toFixed(5)}`;
 };
@@ -96,17 +99,13 @@ const getAdRank = (ad) => {
   return rank;
 };
 
-const compareAds = (AdA, AdB) => {
-  const rankA = getAdRank(AdA);
-  const rankB = getAdRank(AdB);
-
-  return rankB - rankA;
-};
+const filterAds = (ad) => getAdRank(ad) === sumFiltersRank || sumFiltersRank === 0;
 
 const createMarkers = (adsInfo, createAd) => {
+  adsLayer.clearLayers();
   adsInfo
     .slice()
-    .sort(compareAds)
+    .filter(filterAds)
     .slice(0, MAP_CONST.adsCount)
     .forEach((adInfo) => {
       const pinIcon = L.icon({
@@ -126,14 +125,16 @@ const createMarkers = (adsInfo, createAd) => {
       );
 
       marker
-        .addTo(map)
         .bindPopup(
           createAd(adInfo),
           {
             keepInView: true,
           },
         );
+
+      adsLayer.addLayer(marker);
     });
+  adsLayer.addTo(map);
 };
 
 const filtersRank = {
@@ -149,8 +150,6 @@ const filtersRank = {
   conditioner: 0,
 };
 
-let sumFiltersRank = 0;
-
 const getSumFiltersRank = () => {
   sumFiltersRank = Object.values(filtersRank).reduce((accumulator, filterRank) => accumulator + filterRank, 0);
 };
@@ -159,8 +158,6 @@ const setHousingType = (cb) => {
   housingType.addEventListener('change', () => {
     filtersRank.type = housingType.selectedIndex !== 0 ? 1 : 0;
     getSumFiltersRank();
-    console.log(filtersRank.type);
-    console.log(sumFiltersRank);
     cb();
   });
 };
