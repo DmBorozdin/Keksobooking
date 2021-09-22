@@ -4,12 +4,14 @@ const address = form.querySelector('#address');
 const mapFilters = document.querySelector('.map__filters');
 const filters = mapFilters.children;
 const housingType = mapFilters.querySelector('#housing-type');
+const housingRooms = mapFilters.querySelector('#housing-rooms');
+const housingPrice = mapFilters.querySelector('#housing-price');
 
 const MAP_CONST = {
   mapView: {
-    lat: 35.67,
+    lat: 35.85,
     lng: 139.785,
-    zoom: 9.5,
+    zoom: 9,
   },
   mainPinMarker: {
     lat: 35.6634,
@@ -24,6 +26,10 @@ const MAP_CONST = {
     height: 40,
   },
   adsCount: 10,
+  price: {
+    low: 10000,
+    high: 50000,
+  },
 };
 
 const adsLayer = L.layerGroup([]);
@@ -93,7 +99,27 @@ const resetMainPinMarker = () => {
 const getAdRank = (ad) => {
   let rank = 0;
   if (ad.offer.type === housingType.options[housingType.selectedIndex].value) {
-    rank ++;
+    rank++;
+  }
+  if (ad.offer.rooms === Number(housingRooms.options[housingRooms.selectedIndex].value)) {
+    rank++;
+  }
+  switch(housingPrice.options[housingPrice.selectedIndex].value) {
+    case 'middle':
+      if (ad.offer.price <= MAP_CONST.price.high && ad.offer.price >= MAP_CONST.price.low) {
+        rank++;
+      }
+      break;
+    case 'low':
+      if (ad.offer.price < MAP_CONST.price.low) {
+        rank++;
+      }
+      break;
+    case 'high':
+      if (ad.offer.price > MAP_CONST.price.high) {
+        rank++;
+      }
+      break;
   }
 
   return rank;
@@ -154,12 +180,24 @@ const getSumFiltersRank = () => {
   sumFiltersRank = Object.values(filtersRank).reduce((accumulator, filterRank) => accumulator + filterRank, 0);
 };
 
-const setHousingType = (cb) => {
+const setFilters = (cb) => {
   housingType.addEventListener('change', () => {
     filtersRank.type = housingType.selectedIndex !== 0 ? 1 : 0;
     getSumFiltersRank();
     cb();
   });
+
+  housingRooms.addEventListener('change', () => {
+    filtersRank.rooms = housingRooms.selectedIndex !== 0 ? 1 : 0;
+    getSumFiltersRank();
+    cb();
+  });
+
+  housingPrice.addEventListener('change', () => {
+    filtersRank.price = housingPrice.selectedIndex !== 0 ? 1 : 0;
+    getSumFiltersRank();
+    cb();
+  });
 };
 
-export {createMarkers, resetMainPinMarker, setHousingType};
+export {createMarkers, resetMainPinMarker, setFilters};
