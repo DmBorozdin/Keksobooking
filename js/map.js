@@ -3,6 +3,7 @@ const fieldsets = form.querySelectorAll('fieldset');
 const address = form.querySelector('#address');
 const mapFilters = document.querySelector('.map__filters');
 const filters = mapFilters.children;
+const housingType = mapFilters.querySelector('#housing-type');
 
 const MAP_CONST = {
   mapView: {
@@ -22,7 +23,11 @@ const MAP_CONST = {
     width: 40,
     height: 40,
   },
+  adsCount: 10,
 };
+
+const adsLayer = L.layerGroup([]);
+let sumFiltersRank = 0;
 
 const setAddressField = () => {
   address.value = `${MAP_CONST.mainPinMarker.lat.toFixed(5)}, ${MAP_CONST.mainPinMarker.lng.toFixed(5)}`;
@@ -85,33 +90,76 @@ const resetMainPinMarker = () => {
   setAddressField();
 };
 
+const getAdRank = (ad) => {
+  let rank = 0;
+  if (ad.offer.type === housingType.options[housingType.selectedIndex].value) {
+    rank ++;
+  }
+
+  return rank;
+};
+
+const filterAds = (ad) => getAdRank(ad) === sumFiltersRank || sumFiltersRank === 0;
+
 const createMarkers = (adsInfo, createAd) => {
-  adsInfo.forEach((adInfo) => {
-    const pinIcon = L.icon({
-      iconUrl: './img/pin.svg',
-      iconSize: [MAP_CONST.pinIcon.width, MAP_CONST.pinIcon.height],
-      iconAnchor: [MAP_CONST.pinIcon.width/2, MAP_CONST.pinIcon.height],
-    });
+  adsLayer.clearLayers();
+  adsInfo
+    .slice()
+    .filter(filterAds)
+    .slice(0, MAP_CONST.adsCount)
+    .forEach((adInfo) => {
+      const pinIcon = L.icon({
+        iconUrl: './img/pin.svg',
+        iconSize: [MAP_CONST.pinIcon.width, MAP_CONST.pinIcon.height],
+        iconAnchor: [MAP_CONST.pinIcon.width/2, MAP_CONST.pinIcon.height],
+      });
 
-    const marker = L.marker(
-      {
-        lat: adInfo.location.lat,
-        lng: adInfo.location.lng,
-      },
-      {
-        icon: pinIcon,
-      },
-    );
-
-    marker
-      .addTo(map)
-      .bindPopup(
-        createAd(adInfo),
+      const marker = L.marker(
         {
-          keepInView: true,
+          lat: adInfo.location.lat,
+          lng: adInfo.location.lng,
+        },
+        {
+          icon: pinIcon,
         },
       );
+
+      marker
+        .bindPopup(
+          createAd(adInfo),
+          {
+            keepInView: true,
+          },
+        );
+
+      adsLayer.addLayer(marker);
+    });
+  adsLayer.addTo(map);
+};
+
+const filtersRank = {
+  type: 0,
+  price: 0,
+  rooms: 0,
+  guests: 0,
+  wifi: 0,
+  dishwasher: 0,
+  parking: 0,
+  washer: 0,
+  elevator: 0,
+  conditioner: 0,
+};
+
+const getSumFiltersRank = () => {
+  sumFiltersRank = Object.values(filtersRank).reduce((accumulator, filterRank) => accumulator + filterRank, 0);
+};
+
+const setHousingType = (cb) => {
+  housingType.addEventListener('change', () => {
+    filtersRank.type = housingType.selectedIndex !== 0 ? 1 : 0;
+    getSumFiltersRank();
+    cb();
   });
 };
 
-export {createMarkers, resetMainPinMarker};
+export {createMarkers, resetMainPinMarker, setHousingType};
