@@ -2,6 +2,7 @@ import {createAd} from './ad.js';
 import {setUserFormSubmit, resetUserForm} from './form.js';
 import {createMarkers, resetMainPinMarker, setFilters} from './map.js';
 import {getData} from './api.js';
+import './image.js';
 
 const RERENDER_DELAY = 500;
 
