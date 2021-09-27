@@ -7,13 +7,6 @@ const housingType = mapFilters.querySelector('#housing-type');
 const housingRooms = mapFilters.querySelector('#housing-rooms');
 const housingPrice = mapFilters.querySelector('#housing-price');
 const housingGuests = mapFilters.querySelector('#housing-guests');
-const filterWifi = mapFilters.querySelector('#filter-wifi');
-const filterDishwasher = mapFilters.querySelector('#filter-dishwasher');
-const filterParking = mapFilters.querySelector('#filter-parking');
-const filterWasher = mapFilters.querySelector('#filter-washer');
-const filterElevator = mapFilters.querySelector('#filter-elevator');
-const filterConditioner = mapFilters.querySelector('#filter-conditioner');
-
 const mapCheckbox = mapFilters.querySelectorAll('.map__checkbox');
 
 const MAP_CONST = {
@@ -43,7 +36,7 @@ const MAP_CONST = {
 
 const adsLayer = L.layerGroup([]);
 let sumFiltersRank = 0;
-let features = [];
+const features = [];
 
 const setAddressField = () => {
   address.value = `${MAP_CONST.mainPinMarker.lat.toFixed(5)}, ${MAP_CONST.mainPinMarker.lng.toFixed(5)}`;
@@ -134,6 +127,11 @@ const getAdRank = (ad) => {
   if (ad.offer.guests === Number(housingGuests.options[housingGuests.selectedIndex].value)) {
     rank++;
   }
+  ad.offer.features.forEach((feature) => {
+    if (features.includes(feature)) {
+      rank++;
+    }
+  });
 
   return rank;
 };
@@ -190,8 +188,6 @@ const filtersRank = {
   conditioner: 0,
 };
 
-let kol = 0;
-
 const getSumFiltersRank = () => {
   sumFiltersRank = Object.values(filtersRank).reduce((accumulator, filterRank) => accumulator + filterRank, 0);
 };
@@ -224,52 +220,16 @@ const setFilters = (cb) => {
   mapCheckbox.forEach((checkbox) => {
     checkbox.addEventListener('change', () => {
       if (checkbox.checked) {
-        kol++;
+        filtersRank.features++;
         features.push(checkbox.value);
       } else {
-        kol--;
+        filtersRank.features--;
         features.splice(features.indexOf(checkbox.value), 1);
       }
-      console.log(kol);
-      console.log(features);
+      getSumFiltersRank();
+      cb();
     });
   });
-
-  // filterWifi.addEventListener('change', () => {
-  //   filtersRank.wifi = filterWifi.checked ? 1 : 0;
-  //   getSumFiltersRank();
-  //   cb();
-  // });
-
-  // filterDishwasher.addEventListener('change', () => {
-  //   filtersRank.dishwasher = filterDishwasher.checked ? 1 : 0;
-  //   getSumFiltersRank();
-  //   cb();
-  // });
-
-  // filterParking.addEventListener('change', () => {
-  //   filtersRank.parking = filterParking.checked ? 1 : 0;
-  //   getSumFiltersRank();
-  //   cb();
-  // });
-
-  // filterWasher.addEventListener('change', () => {
-  //   filtersRank.washer = filterWasher.checked ? 1 : 0;
-  //   getSumFiltersRank();
-  //   cb();
-  // });
-
-  // filterElevator.addEventListener('change', () => {
-  //   filtersRank.elevator = filterElevator.checked ? 1 : 0;
-  //   getSumFiltersRank();
-  //   cb();
-  // });
-
-  // filterConditioner.addEventListener('change', () => {
-  //   filtersRank.conditioner = filterConditioner.checked ? 1 : 0;
-  //   getSumFiltersRank();
-  //   cb();
-  // });
 };
 
 export {createMarkers, resetMainPinMarker, setFilters};
