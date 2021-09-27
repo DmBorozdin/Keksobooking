@@ -4,12 +4,16 @@ const address = form.querySelector('#address');
 const mapFilters = document.querySelector('.map__filters');
 const filters = mapFilters.children;
 const housingType = mapFilters.querySelector('#housing-type');
+const housingRooms = mapFilters.querySelector('#housing-rooms');
+const housingPrice = mapFilters.querySelector('#housing-price');
+const housingGuests = mapFilters.querySelector('#housing-guests');
+const mapCheckbox = mapFilters.querySelectorAll('.map__checkbox');
 
 const MAP_CONST = {
   mapView: {
-    lat: 35.67,
+    lat: 35.85,
     lng: 139.785,
-    zoom: 9.5,
+    zoom: 9,
   },
   mainPinMarker: {
     lat: 35.6634,
@@ -24,10 +28,15 @@ const MAP_CONST = {
     height: 40,
   },
   adsCount: 10,
+  price: {
+    low: 10000,
+    high: 50000,
+  },
 };
 
 const adsLayer = L.layerGroup([]);
 let sumFiltersRank = 0;
+const features = [];
 
 const setAddressField = () => {
   address.value = `${MAP_CONST.mainPinMarker.lat.toFixed(5)}, ${MAP_CONST.mainPinMarker.lng.toFixed(5)}`;
@@ -93,8 +102,36 @@ const resetMainPinMarker = () => {
 const getAdRank = (ad) => {
   let rank = 0;
   if (ad.offer.type === housingType.options[housingType.selectedIndex].value) {
-    rank ++;
+    rank++;
   }
+  if (ad.offer.rooms === Number(housingRooms.options[housingRooms.selectedIndex].value)) {
+    rank++;
+  }
+  switch(housingPrice.options[housingPrice.selectedIndex].value) {
+    case 'middle':
+      if (ad.offer.price <= MAP_CONST.price.high && ad.offer.price >= MAP_CONST.price.low) {
+        rank++;
+      }
+      break;
+    case 'low':
+      if (ad.offer.price < MAP_CONST.price.low) {
+        rank++;
+      }
+      break;
+    case 'high':
+      if (ad.offer.price > MAP_CONST.price.high) {
+        rank++;
+      }
+      break;
+  }
+  if (ad.offer.guests === Number(housingGuests.options[housingGuests.selectedIndex].value)) {
+    rank++;
+  }
+  ad.offer.features.forEach((feature) => {
+    if (features.includes(feature)) {
+      rank++;
+    }
+  });
 
   return rank;
 };
@@ -142,6 +179,7 @@ const filtersRank = {
   price: 0,
   rooms: 0,
   guests: 0,
+  features: 0,
   wifi: 0,
   dishwasher: 0,
   parking: 0,
@@ -154,12 +192,44 @@ const getSumFiltersRank = () => {
   sumFiltersRank = Object.values(filtersRank).reduce((accumulator, filterRank) => accumulator + filterRank, 0);
 };
 
-const setHousingType = (cb) => {
+const setFilters = (cb) => {
   housingType.addEventListener('change', () => {
     filtersRank.type = housingType.selectedIndex !== 0 ? 1 : 0;
     getSumFiltersRank();
     cb();
   });
+
+  housingRooms.addEventListener('change', () => {
+    filtersRank.rooms = housingRooms.selectedIndex !== 0 ? 1 : 0;
+    getSumFiltersRank();
+    cb();
+  });
+
+  housingPrice.addEventListener('change', () => {
+    filtersRank.price = housingPrice.selectedIndex !== 0 ? 1 : 0;
+    getSumFiltersRank();
+    cb();
+  });
+
+  housingGuests.addEventListener('change', () => {
+    filtersRank.guests = housingGuests.selectedIndex !== 0 ? 1 : 0;
+    getSumFiltersRank();
+    cb();
+  });
+
+  mapCheckbox.forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        filtersRank.features++;
+        features.push(checkbox.value);
+      } else {
+        filtersRank.features--;
+        features.splice(features.indexOf(checkbox.value), 1);
+      }
+      getSumFiltersRank();
+      cb();
+    });
+  });
 };
 
-export {createMarkers, resetMainPinMarker, setHousingType};
+export {createMarkers, resetMainPinMarker, setFilters};
