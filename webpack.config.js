@@ -5,20 +5,25 @@ module.exports = {
   entry: './source/js/main.js',
   devtool: 'source-map',
   output: {
-    filename: 'main.bundle.js',
-    path: path.resolve(__dirname, 'build/js'),
+    filename: 'js/main.bundle.js',
+    path: path.resolve(__dirname, 'build'),
+    assetModuleFilename: 'img/[name][ext]'
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/main.css'
+      filename: 'css/[name].css'
     })
   ],
   module: {
     rules: [
       {
-        test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
+      {
+        test: /\.jpe?g$|\.gif$|\.png$|\.ico$|\.svg$/,
+        type: 'asset/resource'
+      }
     ],
   },
 };
