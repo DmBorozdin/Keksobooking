@@ -1,5 +1,5 @@
 const path = require('path');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: './source/js/main.js',
@@ -8,7 +8,11 @@ module.exports = {
     filename: 'main.bundle.js',
     path: path.resolve(__dirname, 'build/js'),
   },
-  plugins: [new MiniCssExtractPlugin()],
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'css/main.css'
+    })
+  ],
   module: {
     rules: [
       {
