@@ -65,19 +65,19 @@ closeErrorMessage = () => {
   document.removeEventListener('keydown', onEscKeydown);
 };
 
-const resetForm = (resetMainPinMarker) => {
+const resetForm = (resetMap) => {
   form.reset();
   priceInput.placeholder = FORM_CONST.minPrice.flat;
   priceInput.min = FORM_CONST.minPrice.flat;
   getFilteredCapacity();
-  resetMainPinMarker();
+  resetMap();
 };
 
-const showSuccessMessage = (resetMainPinMarker) => {
+const showSuccessMessage = (resetMap) => {
   main.appendChild(successTemplate.cloneNode(true));
   document.addEventListener('keydown', onEscKeydown);
   document.querySelector('.success').addEventListener('click', closeSuccessMessage);
-  resetForm(resetMainPinMarker);
+  resetForm(resetMap);
 };
 
 const showErrorMessage = () => {
@@ -86,22 +86,22 @@ const showErrorMessage = () => {
   document.querySelector('.error').addEventListener('click', closeErrorMessage);
 };
 
-const setUserFormSubmit = (resetMainPinMarker) => {
+const setUserFormSubmit = (resetMap) => {
   form.addEventListener('submit', (evt) => {
     evt.preventDefault();
 
     sendData(
-      () => showSuccessMessage(resetMainPinMarker),
+      () => showSuccessMessage(resetMap),
       () => showErrorMessage(),
       new FormData(evt.target),
     );
   });
 };
 
-const resetUserForm = (resetMainPinMarker) => {
+const resetUserForm = (resetMap) => {
   reset.addEventListener('click', (evt) => {
     evt.preventDefault();
-    resetForm(resetMainPinMarker);
+    resetForm(resetMap);
   });
 };
 

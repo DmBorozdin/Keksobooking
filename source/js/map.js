@@ -37,6 +37,14 @@ const MAP_CONST = {
   },
 };
 
+const filtersRank = {
+  type: 0,
+  price: 0,
+  rooms: 0,
+  guests: 0,
+  features: 0,
+};
+
 const adsLayer = leaflet.layerGroup([]);
 let sumFiltersRank = 0;
 const features = [];
@@ -96,11 +104,6 @@ mainPinMarker.addTo(map);
 mainPinMarker.on('moveend', (evt) =>{
   address.value = `${evt.target.getLatLng().lat.toFixed(5)}, ${evt.target.getLatLng().lng.toFixed(5)}`;
 });
-
-const resetMainPinMarker = () => {
-  mainPinMarker.setLatLng([MAP_CONST.mainPinMarker.lat, MAP_CONST.mainPinMarker.lng]);
-  setAddressField();
-};
 
 const getAdRank = (ad) => {
   let rank = 0;
@@ -177,22 +180,23 @@ const createMarkers = (adsInfo, createAd) => {
   adsLayer.addTo(map);
 };
 
-const filtersRank = {
-  type: 0,
-  price: 0,
-  rooms: 0,
-  guests: 0,
-  features: 0,
-  wifi: 0,
-  dishwasher: 0,
-  parking: 0,
-  washer: 0,
-  elevator: 0,
-  conditioner: 0,
-};
-
 const getSumFiltersRank = () => {
   sumFiltersRank = Object.values(filtersRank).reduce((accumulator, filterRank) => accumulator + filterRank, 0);
+};
+
+const resetMap = (ads, createAd) => {
+  mainPinMarker.setLatLng([MAP_CONST.mainPinMarker.lat, MAP_CONST.mainPinMarker.lng]);
+  setAddressField();
+  mapFilters.reset();
+  filtersRank.type = 0;
+  filtersRank.rooms = 0;
+  filtersRank.price = 0;
+  filtersRank.guests = 0;
+  filtersRank.features = 0;
+  getSumFiltersRank();
+  createMarkers(ads, createAd);
+  console.log(filtersRank);
+  console.log(sumFiltersRank);
 };
 
 const setFilters = (cb) => {
@@ -200,24 +204,32 @@ const setFilters = (cb) => {
     filtersRank.type = housingType.selectedIndex !== 0 ? 1 : 0;
     getSumFiltersRank();
     cb();
+    console.log(filtersRank);
+    console.log(sumFiltersRank);
   });
 
   housingRooms.addEventListener('change', () => {
     filtersRank.rooms = housingRooms.selectedIndex !== 0 ? 1 : 0;
     getSumFiltersRank();
     cb();
+    console.log(filtersRank);
+    console.log(sumFiltersRank);
   });
 
   housingPrice.addEventListener('change', () => {
     filtersRank.price = housingPrice.selectedIndex !== 0 ? 1 : 0;
     getSumFiltersRank();
     cb();
+    console.log(filtersRank);
+    console.log(sumFiltersRank);
   });
 
   housingGuests.addEventListener('change', () => {
     filtersRank.guests = housingGuests.selectedIndex !== 0 ? 1 : 0;
     getSumFiltersRank();
     cb();
+    console.log(filtersRank);
+    console.log(sumFiltersRank);
   });
 
   mapCheckbox.forEach((checkbox) => {
@@ -231,8 +243,10 @@ const setFilters = (cb) => {
       }
       getSumFiltersRank();
       cb();
+      console.log(filtersRank);
+      console.log(sumFiltersRank);
     });
   });
 };
 
-export {createMarkers, resetMainPinMarker, setFilters};
+export {createMarkers, resetMap, setFilters};
