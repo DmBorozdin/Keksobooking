@@ -1,3 +1,6 @@
+import * as leaflet from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
 const form = document.querySelector('.ad-form');
 const fieldsets = form.querySelectorAll('fieldset');
 const address = form.querySelector('#address');
@@ -34,7 +37,7 @@ const MAP_CONST = {
   },
 };
 
-const adsLayer = L.layerGroup([]);
+const adsLayer = leaflet.layerGroup([]);
 let sumFiltersRank = 0;
 const features = [];
 
@@ -47,7 +50,7 @@ for(const filter of filters) {
   filter.disabled = true;
 }
 
-const map = L.map('map-canvas')
+const map = leaflet.map('map-canvas')
   .on('load', () => {
     form.classList.remove('ad-form--disabled');
     for(const fieldset of fieldsets) {
@@ -64,20 +67,20 @@ const map = L.map('map-canvas')
     lng: MAP_CONST.mapView.lng,
   }, MAP_CONST.mapView.zoom);
 
-L.tileLayer(
+leaflet.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   },
 ).addTo(map);
 
-const mainPinIcon = L.icon({
+const mainPinIcon = leaflet.icon({
   iconUrl: './img/main-pin.svg',
   iconSize: [MAP_CONST.mainPinIcon.width, MAP_CONST.mainPinIcon.height],
   iconAnchor: [MAP_CONST.mainPinIcon.width/2, MAP_CONST.mainPinIcon.height],
 });
 
-const mainPinMarker = L.marker(
+const mainPinMarker = leaflet.marker(
   {
     lat: MAP_CONST.mainPinMarker.lat,
     lng: MAP_CONST.mainPinMarker.lng,
@@ -145,13 +148,13 @@ const createMarkers = (adsInfo, createAd) => {
     .filter(filterAds)
     .slice(0, MAP_CONST.adsCount)
     .forEach((adInfo) => {
-      const pinIcon = L.icon({
+      const pinIcon = leaflet.icon({
         iconUrl: './img/pin.svg',
         iconSize: [MAP_CONST.pinIcon.width, MAP_CONST.pinIcon.height],
         iconAnchor: [MAP_CONST.pinIcon.width/2, MAP_CONST.pinIcon.height],
       });
 
-      const marker = L.marker(
+      const marker = leaflet.marker(
         {
           lat: adInfo.location.lat,
           lng: adInfo.location.lng,
