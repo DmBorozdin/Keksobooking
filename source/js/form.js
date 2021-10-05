@@ -11,6 +11,8 @@ const address = form.querySelector('#address');
 const roomNumber = form.querySelector('#room_number');
 const capacity = form.querySelector('#capacity');
 const reset = form.querySelector('.ad-form__reset');
+const avatar = form.querySelector('.ad-form-header__preview img');
+const photos = form.querySelector('.ad-form__photo');
 const capacityList = capacity.querySelectorAll('option');
 const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
@@ -27,6 +29,7 @@ const FORM_CONST = {
     roomNumber100: '0',
   },
   roomNumberMax: '100',
+  defaultAvatarImage: 'img/muffin-grey.svg',
 };
 
 const getFilteredCapacity = () => {
@@ -69,6 +72,8 @@ const resetForm = (resetMap) => {
   form.reset();
   priceInput.placeholder = FORM_CONST.minPrice.flat;
   priceInput.min = FORM_CONST.minPrice.flat;
+  avatar.src = FORM_CONST.defaultAvatarImage;
+  photos.innerHTML = '';
   getFilteredCapacity();
   resetMap();
 };
