@@ -1,6 +1,7 @@
 import * as leaflet from 'leaflet';
-import {getData} from './api.js';
 import 'leaflet/dist/leaflet.css';
+import {getData} from './api.js';
+import debounce from 'lodash/debounce';
 
 const form = document.querySelector('.ad-form');
 const fieldsets = form.querySelectorAll('fieldset');
@@ -233,7 +234,7 @@ const loadMap = (createAd, setUserFormSubmit, resetUserForm) => {
       setAddressField();
       getData((ads) => {
         createMarkers(ads, createAd);
-        setFilters(_.debounce(() => createMarkers(ads, createAd), MAP_CONST.RERENDER_DELAY) );
+        setFilters(debounce(() => createMarkers(ads, createAd), MAP_CONST.RERENDER_DELAY));
         setUserFormSubmit(() => resetMap(ads, createAd));
         resetUserForm(() => resetMap(ads, createAd));
         if (ads.length !== 0 ) {
