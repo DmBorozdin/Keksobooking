@@ -1,8 +1,5 @@
 import {showErrorDownload} from './util.js';
 
-const mapFilters = document.querySelector('.map__filters');
-const filters = mapFilters.children;
-
 const getData = (onSuccess) => {
   fetch('https://22.javascript.pages.academy/keksobooking/data')
     .then((response) => {
@@ -15,10 +12,7 @@ const getData = (onSuccess) => {
     })
     .catch(() => {
       showErrorDownload('Ошибка загрузки объявлений');
-      mapFilters.classList.add('map__filters--disabled');
-      for(const filter of filters) {
-        filter.disabled = true;
-      }
+      onSuccess([]);
     });
 };
 

@@ -1,4 +1,5 @@
 import * as leaflet from 'leaflet';
+import {getData} from './api.js';
 import 'leaflet/dist/leaflet.css';
 
 const form = document.querySelector('.ad-form');
@@ -35,6 +36,7 @@ const MAP_CONST = {
     low: 10000,
     high: 50000,
   },
+  RERENDER_DELAY: 500,
 };
 
 const filtersRank = {
@@ -58,22 +60,7 @@ for(const filter of filters) {
   filter.disabled = true;
 }
 
-const map = leaflet.map('map-canvas')
-  .on('load', () => {
-    form.classList.remove('ad-form--disabled');
-    for(const fieldset of fieldsets) {
-      fieldset.disabled = false;
-    }
-    mapFilters.classList.remove('map__filters--disabled');
-    for(const filter of filters) {
-      filter.disabled = false;
-    }
-    setAddressField();
-  })
-  .setView({
-    lat: MAP_CONST.mapView.lat,
-    lng: MAP_CONST.mapView.lng,
-  }, MAP_CONST.mapView.zoom);
+const map = leaflet.map('map-canvas');
 
 leaflet.tileLayer(
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -236,4 +223,31 @@ const setFilters = (cb) => {
   });
 };
 
-export {createMarkers, resetMap, setFilters};
+const loadMap = (createAd, setUserFormSubmit, resetUserForm) => {
+  map
+    .on('load', () => {
+      form.classList.remove('ad-form--disabled');
+      for(const fieldset of fieldsets) {
+        fieldset.disabled = false;
+      }
+      setAddressField();
+      getData((ads) => {
+        createMarkers(ads, createAd);
+        setFilters(_.debounce(() => createMarkers(ads, createAd), MAP_CONST.RERENDER_DELAY) );
+        setUserFormSubmit(() => resetMap(ads, createAd));
+        resetUserForm(() => resetMap(ads, createAd));
+        if (ads.length !== 0 ) {
+          mapFilters.classList.remove('map__filters--disabled');
+          for(const filter of filters) {
+            filter.disabled = false;
+          }
+        }
+      });
+    })
+    .setView({
+      lat: MAP_CONST.mapView.lat,
+      lng: MAP_CONST.mapView.lng,
+    }, MAP_CONST.mapView.zoom);
+};
+
+export {loadMap};
