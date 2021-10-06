@@ -6,10 +6,19 @@ const isNotEmptyArray = (data) => data.length && data !== undefined;
 
 const createAd = (adInfo) => {
   const ad = adTemplate.cloneNode(true);
+  let capacityText = '';
+  let timeText = '';
 
   isNotEmptyString(adInfo.offer.title) ? ad.querySelector('.popup__title').textContent = adInfo.offer.title : ad.querySelector('.popup__title').style.display = 'none';
   isNotEmptyString(adInfo.offer.address) ? ad.querySelector('.popup__text--address').textContent = adInfo.offer.address : ad.querySelector('.popup__text--address').style.display = 'none';
-  isNotEmptyNumber(adInfo.offer.price) ? ad.querySelector('.popup__text--price').innerHTML = `${adInfo.offer.price} <span>₽/ночь</span>` : ad.querySelector('.popup__text--price').style.display = 'none';
+  if (isNotEmptyNumber(adInfo.offer.price)) {
+    const priceUnit = document.createElement('span');
+    priceUnit.textContent = ' ₽/ночь';
+    ad.querySelector('.popup__text--price').textContent = `${adInfo.offer.price}`;
+    ad.querySelector('.popup__text--price').appendChild(priceUnit);
+  } else {
+    ad.querySelector('.popup__text--price').style.display = 'none';
+  }
   if (isNotEmptyString(adInfo.offer.type)) {
     switch(adInfo.offer.type) {
       case 'palace':
@@ -28,7 +37,6 @@ const createAd = (adInfo) => {
   } else {
     ad.querySelector('.popup__type').style.display = 'none';
   }
-  let capacityText = '';
   if (isNotEmptyNumber(adInfo.offer.rooms)) {
     capacityText = `${adInfo.offer.rooms} комнаты`;
   }
@@ -36,7 +44,6 @@ const createAd = (adInfo) => {
     capacityText += ` для ${adInfo.offer.guests} гостей`;
   }
   isNotEmptyString(capacityText) ? ad.querySelector('.popup__text--capacity').textContent = capacityText : ad.querySelector('.popup__text--capacity').style.display = 'none';
-  let timeText = '';
   if (isNotEmptyString(adInfo.offer.checkin) && isNotEmptyString(adInfo.offer.checkout)) {
     timeText = `Заезд после ${adInfo.offer.checkin}, выезд до ${adInfo.offer.checkout}`;
   } else {

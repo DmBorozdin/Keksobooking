@@ -14,7 +14,7 @@ const housingPrice = mapFilters.querySelector('#housing-price');
 const housingGuests = mapFilters.querySelector('#housing-guests');
 const mapCheckbox = mapFilters.querySelectorAll('.map__checkbox');
 
-const MAP_CONST = {
+const mapInformation = {
   mapView: {
     lat: 35.85,
     lng: 139.785,
@@ -32,7 +32,7 @@ const MAP_CONST = {
     width: 40,
     height: 40,
   },
-  adsCount: 10,
+  ADS_COUNT: 10,
   price: {
     low: 10000,
     high: 50000,
@@ -53,7 +53,7 @@ let sumFiltersRank = 0;
 let features = [];
 
 const setAddressField = () => {
-  address.value = `${MAP_CONST.mainPinMarker.lat.toFixed(5)}, ${MAP_CONST.mainPinMarker.lng.toFixed(5)}`;
+  address.value = `${mapInformation.mainPinMarker.lat.toFixed(5)}, ${mapInformation.mainPinMarker.lng.toFixed(5)}`;
 };
 
 mapFilters.classList.add('map__filters--disabled');
@@ -72,14 +72,14 @@ leaflet.tileLayer(
 
 const mainPinIcon = leaflet.icon({
   iconUrl: './img/main-pin.svg',
-  iconSize: [MAP_CONST.mainPinIcon.width, MAP_CONST.mainPinIcon.height],
-  iconAnchor: [MAP_CONST.mainPinIcon.width/2, MAP_CONST.mainPinIcon.height],
+  iconSize: [mapInformation.mainPinIcon.width, mapInformation.mainPinIcon.height],
+  iconAnchor: [mapInformation.mainPinIcon.width/2, mapInformation.mainPinIcon.height],
 });
 
 const mainPinMarker = leaflet.marker(
   {
-    lat: MAP_CONST.mainPinMarker.lat,
-    lng: MAP_CONST.mainPinMarker.lng,
+    lat: mapInformation.mainPinMarker.lat,
+    lng: mapInformation.mainPinMarker.lng,
   },
   {
     draggable: true,
@@ -103,17 +103,17 @@ const getAdRank = (ad) => {
   }
   switch(housingPrice.options[housingPrice.selectedIndex].value) {
     case 'middle':
-      if (ad.offer.price <= MAP_CONST.price.high && ad.offer.price >= MAP_CONST.price.low) {
+      if (ad.offer.price <= mapInformation.price.high && ad.offer.price >= mapInformation.price.low) {
         rank++;
       }
       break;
     case 'low':
-      if (ad.offer.price < MAP_CONST.price.low) {
+      if (ad.offer.price < mapInformation.price.low) {
         rank++;
       }
       break;
     case 'high':
-      if (ad.offer.price > MAP_CONST.price.high) {
+      if (ad.offer.price > mapInformation.price.high) {
         rank++;
       }
       break;
@@ -137,12 +137,12 @@ const createMarkers = (adsInfo, createAd) => {
   adsInfo
     .slice()
     .filter(filterAds)
-    .slice(0, MAP_CONST.adsCount)
+    .slice(0, mapInformation.ADS_COUNT)
     .forEach((adInfo) => {
       const pinIcon = leaflet.icon({
         iconUrl: './img/pin.svg',
-        iconSize: [MAP_CONST.pinIcon.width, MAP_CONST.pinIcon.height],
-        iconAnchor: [MAP_CONST.pinIcon.width/2, MAP_CONST.pinIcon.height],
+        iconSize: [mapInformation.pinIcon.width, mapInformation.pinIcon.height],
+        iconAnchor: [mapInformation.pinIcon.width/2, mapInformation.pinIcon.height],
       });
 
       const marker = leaflet.marker(
@@ -173,7 +173,7 @@ const getSumFiltersRank = () => {
 };
 
 const resetMap = (ads, createAd) => {
-  mainPinMarker.setLatLng([MAP_CONST.mainPinMarker.lat, MAP_CONST.mainPinMarker.lng]);
+  mainPinMarker.setLatLng([mapInformation.mainPinMarker.lat, mapInformation.mainPinMarker.lng]);
   setAddressField();
   mapFilters.reset();
   for (const filterRank in filtersRank) {
@@ -234,7 +234,7 @@ const loadMap = (createAd, setUserFormSubmit, resetUserForm) => {
       setAddressField();
       getData((ads) => {
         createMarkers(ads, createAd);
-        setFilters(debounce(() => createMarkers(ads, createAd), MAP_CONST.RERENDER_DELAY));
+        setFilters(debounce(() => createMarkers(ads, createAd), mapInformation.RERENDER_DELAY));
         setUserFormSubmit(() => resetMap(ads, createAd));
         resetUserForm(() => resetMap(ads, createAd));
         if (ads.length !== 0 ) {
@@ -246,9 +246,9 @@ const loadMap = (createAd, setUserFormSubmit, resetUserForm) => {
       });
     })
     .setView({
-      lat: MAP_CONST.mapView.lat,
-      lng: MAP_CONST.mapView.lng,
-    }, MAP_CONST.mapView.zoom);
+      lat: mapInformation.mapView.lat,
+      lng: mapInformation.mapView.lng,
+    }, mapInformation.mapView.zoom);
 };
 
 export {loadMap};

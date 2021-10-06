@@ -580,6 +580,7 @@ fieldset {
   height: 70px;
 
   background-color: #e4e4de;
+  background-size: cover;
   border-radius: 5px;
 }
 

@@ -21,11 +21,9 @@ const showErrorDownload = (message) => {
   errorContainer.appendChild(errorContainerMessage);
   document.querySelector('.map').appendChild(errorContainer);
 
-  setTimeout(() => {
-    errorContainer.remove();
-  }, ERROR_SHOW_TIME);
+  setTimeout(() => errorContainer.remove(), ERROR_SHOW_TIME);
 };
 
 const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
-export { showErrorDownload, isEscEvent};
+export {showErrorDownload, isEscEvent};
