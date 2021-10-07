@@ -75,7 +75,7 @@ const resetForm = (resetMap) => {
   priceInput.min = formInformation.minPrice.flat;
   avatar.src = formInformation.DEFAULT_AVATAR;
   if (photoContainer.children.length > 2) {
-    for (let index = 2; index < photoContainer.children.length; index++) {
+    for (let index = photoContainer.children.length - 1; index > 1; index--) {
       photoContainer.removeChild(photoContainer.lastChild);
     }
   }

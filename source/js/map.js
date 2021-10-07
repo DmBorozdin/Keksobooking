@@ -15,7 +15,7 @@ const housingGuests = mapFilters.querySelector('#housing-guests');
 const mapCheckbox = mapFilters.querySelectorAll('.map__checkbox');
 
 const mapInformation = {
-  mapView: {
+  view: {
     lat: 35.85,
     lng: 139.785,
     zoom: 9,
@@ -246,9 +246,9 @@ const loadMap = (createAd, setUserFormSubmit, resetUserForm) => {
       });
     })
     .setView({
-      lat: mapInformation.mapView.lat,
-      lng: mapInformation.mapView.lng,
-    }, mapInformation.mapView.zoom);
+      lat: mapInformation.view.lat,
+      lng: mapInformation.view.lng,
+    }, mapInformation.view.zoom);
 };
 
 export {loadMap};
